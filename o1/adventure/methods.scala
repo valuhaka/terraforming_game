@@ -1,7 +1,29 @@
 package o1.adventure
 
+import scala.annotation.targetName
 import scala.util.Random
 import scala.collection.mutable.Map
+
+extension [A: Numeric](pair1: (A, A))
+  // define addition for numeric paris
+  @targetName("add")
+  def +(pair2: (A, A)): (A, A) =
+    val num = summon[Numeric[A]]
+    (num.plus(pair1._1, pair2._1), num.plus(pair1._2, pair2._2))
+
+  // subtraction for numeric pairs
+  @targetName("subtract")
+  def -(pair2: (A, A)): (A, A) =
+    val num = summon[Numeric[A]]
+    (num.minus(pair1._1, pair2._1), num.minus(pair1._2, pair2._2))
+
+  @targetName("equals")
+  def ==(pair2: (A, A)): Boolean = pair1._1 == pair2._1 && pair1._2 == pair2._2
+
+  @targetName("unequalTo")
+  def !=(pair2: (A, A)): Boolean = pair1._1 != pair2._1 || pair1._2 != pair2._2
+
+
 
 /** This method takes the name of a [[Biome]] as a String and returns the corresponding biome with
   * the default description.

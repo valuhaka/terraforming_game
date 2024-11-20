@@ -2,6 +2,7 @@ package o1.adventure
 
 import o1.adventure.old.Item
 
+import scala.annotation.targetName
 import scala.collection.mutable.Map
 
 /** A Location class represents one single Location in the game [[World]].
@@ -14,31 +15,58 @@ import scala.collection.mutable.Map
   */
 class Location(val coords: (Int, Int), private var biome: Option[Biome], val world: World, val description: String):
 
-  val x: Int = coords._1
-  val y: Int = coords._2
+  def x: Int = coords._1
+  def y: Int = coords._2
 
   private val neighbors = Map[String, Location]()
-  private val deployedItems = Map[Item, Int]()
+  private val deployedItems = Map[String, Set[Item]]()
   private var settled = false
+  private var isOccupied = false
 
-  override def toString = s"($x, $y)"
+  override def toString = s"($x,$y)"
 
   def deployItem(item: Item) =
-    if deployedItems.contains(item) then
-      deployedItems(item) += 1
-    else
-      deployedItems += (item -> 1)
+    this.biome match
+      case None => throw new UnsupportedOperationException(s"Could not deploy $item to biome None.")
+      case Some(someBiome) =>
+        // check if there is already a copy of the item deployed at the location
+        if deployedItems.contains(item.name) then
+          // if the item is a capsule and the present biome is a lake, only 5 capsules can fit
+          if item.name == "capsule" && someBiome.name == "lake" then
+            // max number of capsules already deployed
+            if deployedItems(item.name).size > 4 then
+              false
+            // there is room for more capsules
+            else
+              deployedItems(item.name) += item
+              true
+          // if it's not a capsule at a lake
+          else
+            //if item.name == "capsule" then
+            deployedItems(item.name) += item
+            true
+        // if no copies of this item were previously deployed
+        else
+          deployedItems += (item.name -> Set(item))
+          true
 
   def undeployItem(item: Item) =
-    if deployedItems.contains(item) && deployedItems(item) > 0 then
-      deployedItems(item) -= 1
-      if deployedItems(item) == 0 then
-        deployedItems.remove(item)
+    if deployedItems(item.name).nonEmpty && deployedItems.contains(item.name) then
+      deployedItems(item.name) -= item
+      if deployedItems(item.name).isEmpty then
+        deployedItems.remove(item.name)
     else
       throw new IllegalArgumentException(s"Could not undeploy $item from $this because there was no such item deployed.")
 
+  // in case we want to implement a settling feature; the rover could always teleport to their base and from within the base
+  // could launch nukes (but not in other parts of this World). Only one base can exist at a time. If player re-lands on the World
+  // from the spaceship, he lands directly on the base, instead of the origo (0, 0) point.
   def settle() = this.settled = true
   def unsettle() = this.settled = false
+
+  // keep record of whether this Location is occupied by the rover or not
+  def occupy() = this.isOccupied = true
+  def unoccupy() = this.isOccupied = false
 
   // has the player settled here
   def isSettled = this.settled
@@ -48,7 +76,7 @@ class Location(val coords: (Int, Int), private var biome: Option[Biome], val wor
 
   /** Returns the area that can be reached from this area by moving in the given direction. The result
     * is returned in an `Option`; `None` is returned if there is no exit in the given direction. */
-  def neighbor(direction: String) = this.neighbors(direction)
+  def neighbor(direction: String) = this.neighbors.get(direction)
 
   // get all neighbors as a vector
   def allNeighbors = this.neighbors.values.toVector

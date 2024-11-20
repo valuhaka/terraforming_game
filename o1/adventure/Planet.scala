@@ -4,8 +4,8 @@ import scala.collection.mutable.Map
 
 class Planet(paramMagnitudes: Map[String, Double], biomeProbabilities: Map[String, Double]):
   // time in days
-  val time = 0
-  private val world = World(biomeProbabilities)
+  val days = 0
+  val world = World(biomeProbabilities)
 
   private val params: Map[String, Parameter] = Map(
     "temp"             -> Temperature(paramMagnitudes("temp")),
@@ -19,7 +19,12 @@ class Planet(paramMagnitudes: Map[String, Double], biomeProbabilities: Map[Strin
     "H2O"              -> H2O(paramMagnitudes("H2O").toInt)
   )
 
-  def adjust(param: String, delta: Double = 0, scalar: Double = 1) =
+  def adjustParams(item: Item) =
+    item.paramDeltas.foreach( param =>
+      params(param._1).increase(param._2)
+    )
+
+  def adjustParam(param: String, delta: Double = 0, scalar: Double = 1) =
     if delta != 0 then params(param).increase(delta)
     else params(param).multiply(scalar)
 

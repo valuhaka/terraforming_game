@@ -1,5 +1,7 @@
 package o1.adventure
 
+import scala.annotation.targetName
+
 
 sealed trait Parameter(val name: String) extends Ordered[Parameter]:
 
@@ -7,6 +9,17 @@ sealed trait Parameter(val name: String) extends Ordered[Parameter]:
 
   override def toString: String = this.name
   def compare(that: Parameter): Int = this.magnitude.compare(that.magnitude)
+
+  @targetName("add")
+  def +(that: Parameter): Double = this.magnitude + that.magnitude
+  @targetName("subtract")
+  def -(that: Parameter): Double = this.magnitude - that.magnitude
+  @targetName("equals")
+  def ==(that: Parameter): Boolean = this.magnitude == that.magnitude
+  @targetName("unequalTo")
+  def !=(that: Parameter): Boolean = this.magnitude != that.magnitude
+
+  def diff(that: Parameter): Double = this.magnitude - that.magnitude
 
   def isValid: Boolean =
     if this.name != "" then    // only for parameters relevant to bacteria

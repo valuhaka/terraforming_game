@@ -7,17 +7,14 @@ import scala.collection.mutable.Map
   * @param biomeProbabilities A Map of the names of all the available biomes in the game with their
   *                           respective probabilities in the planet this World belongs to.
   */
-class World(private val biomeProbabilities: Map[String, Double]):
+class World(val biomeProbabilities: Map[String, Double]):
 
-  private val neighbors = Map[String, Location]()
+  val neighbors = Map[String, Location]()
 
   val locations = Map[(Int, Int), Location]()
   for { x <- -3 to 3; y <- -3 to 3 } do
     if isWithinBoundaries(x, y) then    // check whether point is inside the diamond-shaped map
       locations += (x, y) -> Location((x, y), None, this, "")
-
-
-  def biomeProbs = this.biomeProbabilities
 
   // Assign neighbors to each of the locations.
   assignNeighbors(this.locations)

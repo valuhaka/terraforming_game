@@ -16,6 +16,7 @@ class Game:
   /** The character that the player controls in the game. */
   val player = Player(1000, 1000)
   val market = Market()
+  val planet = Planet(testParamMagnitudes, testBiomeProbs)
 
   /** The number of turns that have passed since the start of the game. */
   var turnCount = 0
@@ -30,7 +31,7 @@ class Game:
   def isOver = this.isComplete || this.player.hasQuit || this.turnCount == this.timeLimit
 
   /** Returns a message that is to be displayed to the player at the beginning of the game. */
-  def welcomeMessage = "The year is 2124 AD. You are the captain of SS Väinämö, a terraforming ship in orbit around the exoplanet Tao-73. Your task: life in outer space."
+  def welcomeMessage = "The year is 2124 AD. You are the captain of SS Väinämö, a terraforming ship in orbit around the exoplanet Tao-42. Your task: life in outer space."
 
   /** Returns a message that is to be displayed to the player at the end of the game. The message
     * will be different depending on whether the player has completed their quest. */
