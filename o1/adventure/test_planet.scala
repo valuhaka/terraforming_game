@@ -2,16 +2,8 @@ package o1.adventure
 
 import scala.collection.mutable.Map
 
-val testBiomeProbs = Map(
-  "groundwater" -> 0.15,
-  "permafrost" -> 0.1,
-  "soil" -> 0.3,
-  "rock" -> 0.2,
-  "coast" -> 0.15,
-  "lake" -> 0.1
-)
 
-def test(): Unit =
+def test_planet(): Unit =
   val testworld = World(testBiomeProbs)
   val locs = testworld.locations
 
@@ -37,6 +29,8 @@ def test(): Unit =
   }
 
   println("LOCATION BIOMES BEFORE ASSIGNMENT *************************************************")
+  println("Note that at instantiation a World object assigns locations their biomes; that is")
+  println("why the locations here are not empty.")
   i = 1
   locs.values.foreach( loc =>
     println(s"$i.\t${loc.getBiome}")
@@ -44,7 +38,7 @@ def test(): Unit =
   )
 
   println("ASSIGNING BIOMES...")
-  assignBiomesToLocations(testworld.biomeProbs, locs)
+  assignBiomesToLocationsDEBUGGING(testworld.biomeProbabilities, locs)
   println("BIOMES ASSIGNED! LOCATIONS WITH CORRESPONDING BIOMES:")
   i = 1
   locs.values.foreach( loc =>
