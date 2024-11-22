@@ -29,3 +29,6 @@ class Planet(paramMagnitudes: Map[String, Double], biomeProbabilities: Map[Strin
     else params(param).multiply(scalar)
 
   def overrideParamMagnitude(param: String, newMagnitude: Double) = params(param).setMagnitude(newMagnitude)
+
+  override def toString =
+    params.map( (param, value) => s"$param: ${value.getMagnitude}" ).mkString("\n")

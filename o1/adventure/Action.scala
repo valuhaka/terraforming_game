@@ -15,15 +15,30 @@ class Action(input: String):
     * that the command was understood. Returns a description of what happened as a result
     * of the action (such as “You go west.”). The description is returned in an `Option`
     * wrapper; if the command was not recognized, `None` is returned. */
-  def execute(actor: Player): Option[String] =
+  def execute(game: Game): Option[String] =
+    val actor = game.player
     this.verb match
-      case "buy"       => Some(actor.buy(this.target, this.number.toInt))
-      case "use"       => Some(actor.use(this.target, this.number.toInt))
+      case "buy"       => if number.isEmpty then Some(actor.buy(this.target, 1) + actor.market.toString)
+                                            else Some(actor.buy(this.target, this.number.toInt) + actor.market.toString)
+      case "use"       => if number.isEmpty then Some(actor.use(this.target, 1))
+                                            else Some(actor.use(this.target, this.number.toInt))
       case "examine"   => Some(actor.inventory.examine(target))
-      case "help"      => Some(actor.inventory.toString)
-      case "H"         => Some(actor.inventory.toString)
+      case "help"      => Some(game.helpMessage)
+      case "h"         => Some(game.helpMessage)
       case "inventory" => Some(actor.inventory.toString)
-      case "I"         => Some(actor.inventory.toString)
+      case "i"         => Some(actor.inventory.toString)
+      case "land"      => Some(actor.land())
+      case "l"         => Some(actor.land())
+      case "return"    => Some(actor.takeOff())
+      case "r"         => Some(actor.takeOff())
+      case "move"      => if actor.onPlanet then Some(actor.rover.goto(this.target))
+                                            else Some("Movement is only available on-planet.\n[L] to [land].")
+      case "m"         => if actor.onPlanet then Some(actor.rover.goto(this.target))
+                                            else Some("Movement is only available on-planet.\n[L] to [land].")
+      case "store"     => if !actor.onPlanet then Some(actor.market.toString)
+                                             else Some("The Earth's market are only available aboard the ship.\n[R] to [return] to space.")
+      case "s"         => if !actor.onPlanet then Some(actor.market.toString)
+                                             else Some("The Earth's market are only available aboard the ship.\n[R] to [return] to space.")
       case "skip"      => Some(actor.skip())
       case "quit"      => Some(actor.quit())
       case other       => None
