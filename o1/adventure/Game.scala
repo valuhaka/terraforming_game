@@ -47,9 +47,11 @@ class Game:
                     "\nAfter you planet is suitable for life, you can deploy capsules of macroscopic life on it, hoping they take root." +
                     "\nYou have the following commands:\n" +
                     "\n[I] for [inventory]\n[L] to [land] on theplanet\n[R] to [return] to orbit\n[M] to [move] on the planet" +
-                    "\n[S] to open the [store], that is, the markets}\n[quit] to leave the game\n" +
-                    "\n[Buy] and [use] take numbers too. You may write: [ buy capsules 2 ] or [ use nukes 10 ]." +
-                    "\n[ use nukes ] is equivalent to [ use nukes 1 ]"
+                    "\n[S] to open the [store], that is, the markets.\n[quit] to leave the game" +
+                    "\n[buy] items \n[use] items \n[examine] items\n" +
+                    "\nNote that you must specify the item to [buy], [use], or [examine]. [Buy] and [use] can also take numbers.\n" +
+                    "\nYou may write: [ examine ] [ buy capsule 2 ] or [ use nuke 10 ]." +
+                    "\n[ Use nuke ] is equivalent to [ use nuke 1 ]."
 
   /** Plays a turn by executing the given in-game command, such as “go west”. Returns a textual
     * report of what happened, or an error message if the command was unknown. In the latter

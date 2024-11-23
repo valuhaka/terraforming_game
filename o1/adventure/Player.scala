@@ -12,7 +12,7 @@ import scala.collection.mutable.Map
   * @param startingEnergy  the player’s initial energy resources */
 class Player(startingMoney: Int, startingEnergy: Int):
 
-  private var currentMoney = startingMoney        // gatherer: changes in relation to the previous money
+  private var currentMoney = startingMoney          // gatherer: changes in relation to the previous money
   private var currentEnergy = startingEnergy        // gatherer: changes in relation to the previous energy
 
   var onPlanet = false
@@ -35,19 +35,19 @@ class Player(startingMoney: Int, startingEnergy: Int):
   /** Used to translate money into items. */
   def buy(itemName: String, count: Int): String =
     this.market.consume(itemName, count) match
-      case Some(item: Item) => if this.money < item.price then
+      case Some(item: Item) => if this.money < item.price * count then
                                  "You cannot afford that!"
                                  else
-                                   this.currentMoney -= item.price
+                                   this.currentMoney -= item.price * count
                                    this.inventory.add(item.name, count)
-      case None => s"The market hasn't got enough $itemName(s)!"
+      case None => s"The market hasn't got '$count ${itemName}s'!"
 
   /** Use an item. Remove it from the inventory and deploy it to the planet. */
   def use(itemName: String, count: Int): String =
     this.inventory.consume(itemName, count) match
       case Some(item) =>
-        this.planet.adjustParams(item)
-        s"$count ${item.name}(s) used."
+        for _ <- (1 to count) do this.planet.adjustParams(item)
+        if count == 1 then s"One $itemName used." else s"$count ${itemName}s used."
       case None => "Not enough " + itemName + "s."
 
   /** Causes the player to skip a turn (this has no substantial effect in game terms). */
@@ -59,6 +59,9 @@ class Player(startingMoney: Int, startingEnergy: Int):
   def quit(): String =
     this.quitCommandGiven = true
     ""
+
+  /** Return commentary on the industrial society. */
+  def tedTalk: String = "The Industrial Revolution and its consequences have been a disaster for the human race. They have greatly increased the life-expectancy of those of us who live in 'advanced' countries, but they have destabilized society, have made life unfulfilling, have subjected human beings to indignities, have led to widespread psychological suffering (in the Third World to physical suffering as well) and have inflicted severe damage on the natural world. The continued development of technology will worsen the situation. It will certainly subject human beings to greater indignities and inflict greater damage on the natural world, it will probably lead to greater social disruption and psychological suffering, and it may lead to increased physical suffering even in 'advanced' countries. The industrial-technological system may survive or it may break down. If it survives, it MAY eventually achieve a low level of physical and psychological suffering, but only after passing through a long and very painful period of adjustment and only at the cost of permanently reducing human beings and many other living organisms to engineered products and mere cogs in the social machine. Furthermore, if the system survives, the consequences will be inevitable: There is no way of reforming or modifying the system so as to prevent it from depriving people of dignity and autonomy. If the system breaks down the consequences will still be very painful. But the bigger the system grows the more disastrous the results of its breakdown will be, so if it is to break down it had best break down sooner rather than later."
 
   def land(): String =
     if !this.onPlanet then
@@ -72,13 +75,13 @@ class Player(startingMoney: Int, startingEnergy: Int):
       this.onPlanet = false
       "You pack up your rover, board the shuttle, and soon you are back in orbit."
     else
-      "You cannot take off if you're already in space!"
+      "You cannot take off if you are already in space!"
 
   /** Returns a brief description of the player’s state. */
   override def toString =
     var string = ("Money: " + this.money + " M€" +
                   "\n" +
-                  "Energy: " + this.money + " units")
+                  "Energy: " + this.energy + " units")
     if !this.onPlanet then
       this.planet.toString +
                "\n\n" + string +

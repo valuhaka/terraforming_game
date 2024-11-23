@@ -9,14 +9,14 @@ trait Owner:
 
   /* Singleton objects to represent in-game goods. */
 
-  private val Nuke = Item("nukes", "50 megatons of atomic fun. Will heat the planet.",
+  private val Nuke = Item("nuke", "50 megatons of atomic fun. Will heat the planet.",
                   price = 50, isUsableOnPlanet = false)
   Nuke.changeParam("temp", 0.5)
 
-  private val Capsule = Item("capsules", "Ever heard of seed bombs? This is a seed bomb, just with 700 kg of bacteria, algae, and the like.",
+  private val Capsule = Item("bio-capsule", "Ever heard of seed bombs? This is a seed bomb, just with 700 kg of bacteria, algae, and the like.",
                   price = 50, isUsableOnPlanet = true)
 
-  private val MicrobeTank = Item("microbe tanks", "Bacteria, viruses, and other micro-organisms to produce oxygen.",
+  private val MicrobeTank = Item("microbe-tank", "Bacteria, viruses, and other micro-organisms to produce oxygen.",
                   price = 25, isUsableOnPlanet = false)
   MicrobeTank.changeParam("O2", 0.5)
   MicrobeTank.changeParam("CO2", -0.5)
@@ -29,6 +29,17 @@ trait Owner:
   )
 
   def currentItems = items
+
+  def makeNames: Vector[String] =
+      items.map {
+        case (item, 1) => s"1 ${item.name}"
+        case (item, count) => s"$count ${item.name}s"
+      }.zipWithIndex.map( (str, ind) => s"${ind + 1}. $str" ).toVector
+
+  def makeNames(displayPrice: Boolean): Vector[String] =
+    if displayPrice then
+      makeNames.zip( items.keys ).map( (str, item) =>  s"$str, ${item.price} M€ each" )
+    else makeNames
 
   /* Check whether the inventory contains N or more of an item. */
   def has(itemName: String, count: Int): Boolean =
@@ -47,7 +58,8 @@ trait Owner:
     this.items = this.items.map( (item, count) => if item.name == itemName
                                         then (item, count + countToAdd)
                                         else (item, count) )
-    s"You have acquired ${countToAdd} ${itemName}(s)."
+    if countToAdd == 1 then s"You have acquired one ${itemName}."
+                       else s"You have acquired ${countToAdd} ${itemName}s."
 
   /* Remove n instances of the item from the map. Return the Item object wrapped in an Option.
   * Make sure that the frequency is always nonnegative. */
@@ -63,10 +75,12 @@ trait Owner:
                                         (item, count) )
     returnItem
 
+  /* Return the name, count, and description of an item. */
   def examine(itemName: String): String =
     this.items.find((item, count) => item.name == itemName) match
-      case Some(item -> count) => s"\nYou have ${count} ${item.name}(s). \n- ${item.description}"
-      case None => itemName + "? There is no such item."
+      case Some(item -> count) => if count == 1 then s"You have one ${item.name}. Description: \n- ${item.description}"
+                                                else s"You have ${count} ${item.name}s. Description: \n- ${item.description}"
+      case None => itemName.capitalize + "? There is no such item."
 
 end Owner
 
@@ -74,15 +88,15 @@ end Owner
 class Market extends Owner:
 
   /* Init */
-  this.add("nukes", 100)
-  this.add("microbe tanks", 100)
-  this.add("capsules", 20)
+  this.add("nuke", 100)
+  this.add("microbe-tank", 100)
+  this.add("bio-capsule", 20)
 
   /** Returns a short textual representation of the available goods and their prices. */
   override def toString = "The Earth's goods are available to you, but not for free.\nThe following items are currently available:" +
-    "\n\n♦ " +
-    currentItems.map( (item, count) => s"$count ${item}s, ${item.price} M€ each" ).mkString("\n♦ ") +
-    "\n\nHint: to buy 12 nukes, write [ buy nukes 12 ]."
+    "\n\n" +
+    makeNames(displayPrice = true).mkString("\n") +
+    "\n\nHint: to buy 12 nukes, write [ buy nuke 12 ]."
 
 end Market
 
@@ -90,11 +104,11 @@ end Market
 class Inventory extends Owner:
 
   /* Init */
-  this.add("capsules", 10)
+  this.add("bio-capsule", 10)
 
   /** Returns a short textual representation of the contents of the player's inventory. */
-  override def toString = "The ship's loading bays always bustle with action: crates coming and going, visitors arriving and leaving. \nJust now, the ship is carrying."
-                + "\n\n♦ " + currentItems.map( (item, count) => s"$count ${item}s" ).mkString("\n♦ ") +
+  override def toString = "The ship's loading bays always bustle with action: crates coming and going, visitors arriving and leaving. \nJust now, the ship is carrying the following items:"
+                + "\n\n" + makeNames.mkString("\n") +
                 "\n\nHint: If you need more, just check the [S]tore."
 
 end Inventory

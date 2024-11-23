@@ -17,12 +17,16 @@ class Action(input: String):
     * wrapper; if the command was not recognized, `None` is returned. */
   def execute(game: Game): Option[String] =
     val actor = game.player
+
+    def isSafeInt(str: String): Boolean = if str.nonEmpty && str.matches("\\d+") && str.toInt != 0 then true else false
+
     this.verb match
-      case "buy"       => if number.isEmpty then Some(actor.buy(this.target, 1) + actor.market.toString)
-                                            else Some(actor.buy(this.target, this.number.toInt) + actor.market.toString)
-      case "use"       => if number.isEmpty then Some(actor.use(this.target, 1))
-                                            else Some(actor.use(this.target, this.number.toInt))
-      case "examine"   => Some(actor.inventory.examine(target))
+      case "buy"       => if isSafeInt(number)   then Some(actor.buy(this.target, this.number.toInt))
+                          else if number.isEmpty then Some(actor.buy(this.target, 1))
+                                                 else None
+      case "use"       => if isSafeInt(number)   then Some(actor.use(this.target, this.number.toInt))
+                          else if number.isEmpty then Some(actor.use(this.target, 1))
+                                                 else None
       case "help"      => Some(game.helpMessage)
       case "h"         => Some(game.helpMessage)
       case "inventory" => Some(actor.inventory.toString)
@@ -39,6 +43,8 @@ class Action(input: String):
                                              else Some("The Earth's market are only available aboard the ship.\n[R] to [return] to space.")
       case "s"         => if !actor.onPlanet then Some(actor.market.toString)
                                              else Some("The Earth's market are only available aboard the ship.\n[R] to [return] to space.")
+      case "examine"   => if target == "society" then Some(actor.tedTalk)
+                                                 else Some(actor.inventory.examine(target))
       case "skip"      => Some(actor.skip())
       case "quit"      => Some(actor.quit())
       case other       => None
