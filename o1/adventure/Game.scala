@@ -15,8 +15,6 @@ class Game:
 
   /** The character that the player controls in the game. */
   val player = Player(1000, 1000)
-  val market = Market()
-  val planet = Planet(testParamMagnitudes, testBiomeProbs)
 
   /** The number of turns that have passed since the start of the game. */
   var turnCount = 0
@@ -24,7 +22,7 @@ class Game:
   val timeLimit = 40
 
 
-  /** Determines if the adventure is complete, that is, if the player has won. */
+  /** Determines if the player has completed his objects: terraformed a planet and planted life on it. */
   def isComplete = false
 
   /** Determines whether the player has won, lost, or quit, thereby ending the game. */
@@ -43,16 +41,28 @@ class Game:
     else  // game over due to player quitting
       "Quitter!"
 
+  /** Returns a message that is to be displayed when the player asks for help. */
+  def helpMessage = "This is a game of terraforming." +
+                    "\nYour goal is to alter the conditions of an exoplanet buy using items, which you may buy from the market." +
+                    "\nAfter you planet is suitable for life, you can deploy capsules of macroscopic life on it, hoping they take root." +
+                    "\nYou have the following commands:\n" +
+                    "\n[I] for [inventory]\n[L] to [land] on theplanet\n[R] to [return] to orbit\n[M] to [move] on the planet" +
+                    "\n[S] to open the [store], that is, the markets}\n[quit] to leave the game\n" +
+                    "\n[Buy] and [use] take numbers too. You may write: [ buy capsules 2 ] or [ use nukes 10 ]." +
+                    "\n[ use nukes ] is equivalent to [ use nukes 1 ]"
 
   /** Plays a turn by executing the given in-game command, such as “go west”. Returns a textual
     * report of what happened, or an error message if the command was unknown. In the latter
     * case, no turns elapse. */
   def playTurn(command: String): String =
     val action = Action(command)
-    val outcomeReport = action.execute(this.player)
+    val outcomeReport = action.execute(this)
     if outcomeReport.isDefined then
       this.turnCount += 1
     outcomeReport.getOrElse(s"""Unknown command: "$command".""")
+
+  override def toString =
+    this.player.toString
 
 end Game
 
