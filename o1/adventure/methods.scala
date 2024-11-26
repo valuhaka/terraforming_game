@@ -31,13 +31,13 @@ extension [A: Numeric](pair1: (A, A))
   * @param biomeName The name of the biome
   * @return [[Biome]]
   */
-def createBiome(biomeName: String): Biome = biomeName match {
-  case "groundwater" => new Groundwater("")
-  case "permafrost"  => new Permafrost("")
-  case "soil"        => new Soil("")
-  case "rock"        => new Rock("")
-  case "coast"       => new Coast("")
-  case "lake"        => new Lake("")
+def createBiome(biomeName: String, world: World): Biome = biomeName match {
+  case "groundwater" => new Groundwater("", world)
+  case "permafrost"  => new Permafrost("", world)
+  case "soil"        => new Soil("", world)
+  case "rock"        => new Rock("", world)
+  case "coast"       => new Coast("", world)
+  case "lake"        => new Lake("", world)
   case unknownBiome  => throw new IllegalArgumentException(s"Unknown biome: $unknownBiome")
 }
 
@@ -114,11 +114,15 @@ def assignNeighbors(locations: Map[(Int, Int), Location]) =
   * The method will take care of rounding errors by dropping off random biomes. Coasts will, however, not
   * be affected by this.
   *
-  * @param biomeProbs A Map of all possible Biomes (in this case, they are referenced to with Strings)
-  *                   with their respective probabilities.
-  * @param locations A Map of all coordinates and the respective [[Location]] objects.
+  * This method could have been divided into several tinier methods, but the creators of the game saw that
+  * as unnecessary for the implementation of the game logic; we valued more keeping the list of methods simple.
+  *
+  * @param world The world where the biomes are going to be assigned
   **/
-def assignBiomesToLocations(biomeProbs: Map[String, Double], locations: Map[(Int, Int), Location]): Unit =
+def assignBiomesToLocations(world: World): Unit =
+  val biomeProbs = world.biomeProbabilities
+  val locations = world.locations
+  
   // Count how many biomes are needed
   val totalLocations = locations.size
   val biomeCounts = biomeProbs.map { case (biome, prob) =>
@@ -141,7 +145,7 @@ def assignBiomesToLocations(biomeProbs: Map[String, Double], locations: Map[(Int
   // Set biome to coast for as many valid locations as needed
   coastLocationsMixed.take(coastCount).foreach { coords =>
     val location = locations(coords)
-    location.setBiome(createBiome("coast"))
+    location.setBiome(createBiome("coast", world))
   }
 
   // Put the remaining biomes and their respective quantities in a Map
@@ -162,7 +166,7 @@ def assignBiomesToLocations(biomeProbs: Map[String, Double], locations: Map[(Int
   // from the given locations and set its biome to biomeName
   Random.shuffle(remainingBiomes.toList).zip(otherLocations).foreach { case (biomeName, coords) =>
     val location = locations(coords)
-    location.setBiome(createBiome(biomeName))
+    location.setBiome(createBiome(biomeName, world))
   }
 
 /**
@@ -171,7 +175,7 @@ def assignBiomesToLocations(biomeProbs: Map[String, Double], locations: Map[(Int
   * @param biomeProbs
   * @param locations
   */
-def assignBiomesToLocationsDEBUGGING(biomeProbs: Map[String, Double], locations: Map[(Int, Int), Location]): Unit =
+def assignBiomesToLocationsDEBUGGING(biomeProbs: Map[String, Double], locations: Map[(Int, Int), Location], world: World): Unit =
   // count how many biomes are needed
   val totalLocations = locations.size
   val biomeCounts = biomeProbs.map { case (biome, prob) =>
@@ -216,7 +220,7 @@ def assignBiomesToLocationsDEBUGGING(biomeProbs: Map[String, Double], locations:
   coastLocationsMixed.take(coastCount).foreach { coords =>
     val location = locations(coords)
     print(s"$i.\tOperating location: $location\t\tBiome before: ${location.getBiome}\t")
-    location.setBiome(createBiome("coast"))
+    location.setBiome(createBiome("coast", world))
     println(s"Biome after: ${location.getBiome.getOrElse("None")}")
     i += 1
   }
@@ -256,5 +260,5 @@ def assignBiomesToLocationsDEBUGGING(biomeProbs: Map[String, Double], locations:
   println(s"size of otherLocations:\t\t${otherLocations.size}")
   Random.shuffle(remainingBiomes.toList).zip(otherLocations).foreach { case (biomeName, coords) =>
     val location = locations(coords)
-    location.setBiome(createBiome(biomeName))
+    location.setBiome(createBiome(biomeName, world))
   }

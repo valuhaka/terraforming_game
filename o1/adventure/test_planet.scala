@@ -38,7 +38,7 @@ def test_planet(): Unit =
   )
 
   println("ASSIGNING BIOMES...")
-  assignBiomesToLocationsDEBUGGING(testworld.biomeProbabilities, locs)
+  assignBiomesToLocationsDEBUGGING(testworld.biomeProbabilities, locs, testworld)
   println("BIOMES ASSIGNED! LOCATIONS WITH CORRESPONDING BIOMES:")
   i = 1
   locs.values.foreach( loc =>

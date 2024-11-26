@@ -36,6 +36,9 @@ class Rover(val world: World, private var coords: (Int, Int) = (0, 0)):
       // else...
     // if the rover is at origo, do nothing
 
+    // print the surroundings
+    s"${this.lookAround}"
+
   private def move(dir: String): String =
     this.currentLocation.neighbor(dir) match
       case None =>
@@ -55,8 +58,11 @@ class Rover(val world: World, private var coords: (Int, Int) = (0, 0)):
         // write in the memory of the new currentLocation that the rover has arrived
         this.currentLocation.occupy()
 
-        // return a string for UI print
+        // return the coords change for debugging purposes
         s"Moved from $precedentLoc to ${this.currentCoords}."
+
+        // return a string for print
+        s"${this.lookAround}"
 
   def goto(direction: String): String =
     // call move method of this rover or return error print
@@ -71,6 +77,9 @@ class Rover(val world: World, private var coords: (Int, Int) = (0, 0)):
     this.currentLocation.getBiome match
       case None => throw new UnsupportedOperationException(s"No biome has been assigned to Location ${this.currentLocation}.")
       case Some(biome) => biome.toString
+
+  def legalDirections: String =
+    s"Possible exits: ${this.currentLocation.legalDirections.mkString(", ")}"
 
   def currentCoords = this.coords
   def currentLocation = this.world.locations(this.currentCoords)

@@ -20,5 +20,5 @@ class World(val biomeProbabilities: Map[String, Double]):
   assignNeighbors(this.locations)
 
   // Assign a biome to each of the locations.
-  assignBiomesToLocations(this.biomeProbabilities, this.locations)
+  assignBiomesToLocations(this)
 

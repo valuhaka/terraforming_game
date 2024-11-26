@@ -24,9 +24,10 @@ class Action(input: String):
       case "buy"       => if isSafeInt(number)   then Some(actor.buy(this.target, this.number.toInt))
                           else if number.isEmpty then Some(actor.buy(this.target, 1))
                                                  else None
-      case "use"       => if isSafeInt(number)   then Some(actor.use(this.target, this.number.toInt))
-                          else if number.isEmpty then Some(actor.use(this.target, 1))
-                                                 else None
+      case "use"       => if target == "bio-capsule"  then Some(actor.useCapsule)
+                          else if isSafeInt(number)   then Some(actor.use(this.target, this.number.toInt))
+                          else if number.isEmpty      then Some(actor.use(this.target, 1))
+                                                      else None
       case "help"      => Some(game.helpMessage)
       case "h"         => Some(game.helpMessage)
       case "inventory" => Some(actor.inventory.toString)

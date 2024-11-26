@@ -50,6 +50,17 @@ class Player(startingMoney: Int, startingEnergy: Int):
         if count == 1 then s"One $itemName used." else s"$count ${itemName}s used."
       case None => "Not enough " + itemName + "s."
 
+  //* Use the capsule. May win the game. */
+  def useCapsule: String =
+    if this.planet.isLivable then
+      this.use("bio-capsule", 1) match
+        case str if str.startsWith("Not enough") => "Not enough bio-capsules."
+        case str =>
+          this.planet.isHabited = true
+          ""
+    else
+      "You may not use a capsule before the planet is sufficiently terraformed!"
+
   /** Causes the player to skip a turn (this has no substantial effect in game terms). */
   def skip(): String =
     "You skip a turn."
@@ -66,9 +77,9 @@ class Player(startingMoney: Int, startingEnergy: Int):
   def land(): String =
     if !this.onPlanet then
       this.onPlanet = true
-      "You have reached the planet's surface.\nYour rover's fusion reactors start up."
+      "You have reached the planet's surface.\nYour rover's fusion reactors start up.\n"
     else
-      "You cannot land if you're already on the planet!"
+      "You cannot land if you're already on the planet!\n"
 
   def takeOff(): String =
     if this.onPlanet then

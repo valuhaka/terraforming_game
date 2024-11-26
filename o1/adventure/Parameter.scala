@@ -53,31 +53,42 @@ class H2O(val amount: Int) extends Parameter(""):
 
   protected var magnitude = this.amount.toDouble
   override def toString = "H2O"
+  override def isValid = true
 
   override def increase(delta: Double) =
     throw new UnsupportedOperationException("Failed to change the amount (magnitude) of H20, because the amount is a constant.")
   override def multiply(scalar: Double) =
     throw new UnsupportedOperationException("Failed to change the amount (magnitude) of H2O, because the amount is a constant.")
 
-
+// to increase: nukes
+// to decrease: seed white dust to atmosphere
 class Temperature(protected var magnitude: Double) extends Parameter("temp")
 
-
+// to increase: redirect an icy comet & increase temp > 0
+// to decrease: deploy chemical agents to absorb water & decrease temp < 0
 class Moisture(protected var magnitude: Double) extends Parameter("moisture")
 
-
+// to increase: import gas from nearby gas cloud
+// to decrease: use electromagnetic launchers to eject atmospheric gases into space
 class Pressure(protected var magnitude: Double) extends Parameter("pressure")
 
 
-class Density(protected var magnitude: Double) extends Parameter("density")
-
-
-sealed trait Concentration(molecule: String, percent: Double) extends Parameter:
+sealed trait Gas(molecule: String, percent: Double) extends Parameter:
   def concentration: Double = this.percent
 
+// to increase: split water into hydrogen and oxygen with catalysts
+// to decrease: burn oxygen or react it with nitrogen
+class O2(protected var magnitude: Double) extends Gas("O2", magnitude), Parameter("O2")
 
-class O2(protected var magnitude: Double) extends Concentration("O2", magnitude), Parameter("O2")
+// to increase: import coal-rich comets & burn coal
+// to decrease: sequester co2 into solid carbonates
+class CO2(protected var magnitude: Double) extends Gas("CO2", magnitude), Parameter("CO2")
 
-class CO2(protected var magnitude: Double) extends Concentration("CO2", magnitude), Parameter("CO2")
+// to increase: import nitrogen-rich comets
+// to decrease: vent nitrogen into space with targeted plasma jets
+class N2(protected var magnitude: Double) extends Gas("N2", magnitude), Parameter("N2")
 
-class N2(protected var magnitude: Double) extends Concentration("N2", magnitude), Parameter("N2")
+
+// to decrease: seed the atmosphere with catalysts and chemical agents
+class ToxicGases(protected var magnitude: Double)
+  extends Gas("toxic gases", magnitude), Parameter("toxic gases")

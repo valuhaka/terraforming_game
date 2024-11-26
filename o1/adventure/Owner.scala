@@ -13,7 +13,7 @@ trait Owner:
                   price = 50, isUsableOnPlanet = false)
   Nuke.changeParam("temp", 0.5)
 
-  private val Capsule = Item("bio-capsule", "Ever heard of seed bombs? This is a seed bomb, just with 700 kg of bacteria, algae, and the like.",
+  private val BioCapsule = Item("bio-capsule", "Ever heard of seed bombs? This is a seed bomb, just with 700 kg of bacteria, algae, and the like.",
                   price = 50, isUsableOnPlanet = true)
 
   private val MicrobeTank = Item("microbe-tank", "Bacteria, viruses, and other micro-organisms to produce oxygen.",
@@ -24,7 +24,7 @@ trait Owner:
   /* Map: contains the items and their respective frequencies. */
   private var items = Map[Item, Int](
     Nuke -> 0,
-    Capsule -> 0,
+    BioCapsule -> 0,
     MicrobeTank -> 0
   )
 

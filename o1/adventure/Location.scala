@@ -81,6 +81,9 @@ class Location(val coords: (Int, Int), private var biome: Option[Biome], val wor
   // get all neighbors as a vector
   def allNeighbors = this.neighbors.values.toVector
 
+  // get all legal directions
+  def legalDirections = this.neighbors.keys.toVector
+
   // make it possible to set a biome to the location ONLY IF there was no biome defined
   def setBiome(newBiome: Biome): Boolean =
     this.biome match
