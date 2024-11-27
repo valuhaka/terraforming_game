@@ -14,18 +14,23 @@ trait Owner:
   Nuke.changeParam("temp", 0.5)
 
   private val BioCapsule = Item("bio-capsule", "Ever heard of seed bombs? This is a seed bomb, just with 700 kg of bacteria, algae, and the like.",
-                  price = 50, isUsableOnPlanet = true)
+                  price = 100, isUsableOnPlanet = true)
 
   private val MicrobeTank = Item("microbe-tank", "Bacteria, viruses, and other micro-organisms to produce oxygen.",
                   price = 25, isUsableOnPlanet = false)
   MicrobeTank.changeParam("O2", 0.5)
   MicrobeTank.changeParam("CO2", -0.5)
 
+  private val IceMeteor = Item("ice-meteor", "One way to add wate to planet's surface is to run drop it from above.",
+                  price = 50, isUsableOnPlanet = false)
+  MicrobeTank.changeParam("H2O", 20)
+
   /* Map: contains the items and their respective frequencies. */
   private var items = Map[Item, Int](
     Nuke -> 0,
     BioCapsule -> 0,
-    MicrobeTank -> 0
+    MicrobeTank -> 0,
+    IceMeteor -> 0
   )
 
   def currentItems = items
@@ -88,9 +93,10 @@ end Owner
 class Market extends Owner:
 
   /* Init */
-  this.add("nuke", 100)
-  this.add("microbe-tank", 100)
-  this.add("bio-capsule", 20)
+  this.add("nuke", 10)
+  this.add("microbe-tank", 10)
+  this.add("bio-capsule", 10)
+  this.add("ice-meteor", 10)
 
   /** Returns a short textual representation of the available goods and their prices. */
   override def toString = "The Earth's goods are available to you, but not for free.\nThe following items are currently available:" +
@@ -104,7 +110,7 @@ end Market
 class Inventory extends Owner:
 
   /* Init */
-  this.add("bio-capsule", 10)
+  this.add("bio-capsule", 1)
 
   /** Returns a short textual representation of the contents of the player's inventory. */
   override def toString = "The ship's loading bays always bustle with action: crates coming and going, visitors arriving and leaving. \nJust now, the ship is carrying the following items:"

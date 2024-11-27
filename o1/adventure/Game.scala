@@ -58,21 +58,21 @@ For more help, see [ help ]."""
   /** Returns a message that is to be displayed when the player asks for help. */
   def helpMessage =
     """This is a game of terraforming.
-  Your goal is to alter the conditions of an exoplanet by using items, which you may buy from the market.
-  After you planet is suitable for life, you can deploy capsules of macroscopic life on it, hoping they take root.
+Your goal is to alter the conditions of an exoplanet by using items, which you may buy from the market.
+After you planet is suitable for life, you can deploy capsules of macroscopic life on it, hoping they take root.
 
-  You have the following commands:
-  [ I ] for [ inventory ]
-  [ L ] to [land] on the planet
-  [ R ] to [ return ] to orbit
-  [ M ] to [ move ] around on the planet
-  [ S ] to open the [ store ] menu, that is, the markets.
-  [ quit ] to leave the game
+You have the following commands:
+[ I ] for [ inventory ]
+[ L ] to [land] on the planet
+[ R ] to [ return ] to orbit
+[ M ] to [ move ] around on the planet
+[ S ] to open the [ store ] menu, that is, the markets.
+[ quit ] to leave the game
 
-  You can [ buy ], [ use ], and [ examine ] items.
-  Note that you must specify the item with the commands. [Buy] and [use] can also take numbers.
-  You may write: [ examine ] [ buy bio-capsule 2 ] or [ use nuke 10 ].
-  [ Use nuke ] is equivalent to [ use nuke 1 ]."""
+You can [ buy ], [ use ], and [ examine ] items.
+Note that you must specify the item with the commands. [Buy] and [use] can also take numbers.
+You may write: [ examine ] [ buy bio-capsule 2 ] or [ use nuke 10 ].
+[ Use nuke ] is equivalent to [ use nuke 1 ]."""
 
   /** Plays a turn by executing the given in-game command, such as “go west”. Returns a textual
     * report of what happened, or an error message if the command was unknown. In the latter
