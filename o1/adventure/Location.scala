@@ -1,6 +1,6 @@
 package o1.adventure
 
-import o1.adventure.old.Item
+import o1.adventure.Item
 
 import scala.annotation.targetName
 import scala.collection.mutable.Map
