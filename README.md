@@ -18,3 +18,5 @@ use bio-capsule
 ```
 
 ## A map of the planet's surface
+
+![](planet_map.jpg)
