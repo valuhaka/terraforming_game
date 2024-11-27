@@ -3,6 +3,14 @@ package o1.adventure
 import scala.collection.mutable.Map
 
 
+val tutorialPlanetMagnitudes = Map(
+  "temp" -> 250.0,
+  "N2"   -> 50.0,
+  "O2"   -> 4.0,
+  "CO2"  -> 46.0,
+  "logisticDistance" -> 10.0
+)
+
 val testBiomeProbs = Map(
   "groundwater" -> 0.15,
   "permafrost" -> 0.1,
@@ -14,34 +22,19 @@ val testBiomeProbs = Map(
 
 val referenceValues: Map[String, Vector[Double]] = Map(
   "temp"     -> Vector(288.0, 298.0),
-  "moisture" -> Vector(0.3,   0.7),
-  "pressure" -> Vector(0.5,  2.0),
   "N2"       -> Vector(0.70,  0.86),
   "O2"       -> Vector(0.15,  0.27),
   "CO2"      -> Vector(0.005,  0.02),
-  "toxic gases" -> Vector(0, 0.01),
-  ""         -> Vector()
 )
 
-val testParamMagnitudes: Map[String, Double] = Map(
+val EarthMagnitudes: Map[String, Double] = Map(
   "temp"     -> 293,
-  "moisture" -> 0.5,
-  "pressure" -> 1,
   "N2"       -> 0.78,
   "O2"       -> 0.21,
   "CO2"      -> 0.01,
-  "toxic gases" -> 0,
-  "logisticDistance" -> 10,
-  "H2O" -> 100,
-  ""         -> 0
+  "logisticDistance" -> 0
 )
 
-//val Earth = new Planet(testParamMagnitudes, testBiomeProbs)
-  /*referenceValues.map { case (param, data) =>
-    param -> (data.head + data.last) / 2
-  }*/
-
-  //( (str1, Vector(d1, d2)) => (str1, d1+d2/2) )
 
 val directionStep: Map[String, (Int, Int)] = Map(
   "north" -> (0, 1),
@@ -50,41 +43,35 @@ val directionStep: Map[String, (Int, Int)] = Map(
   "west"  -> (-1, 0)
 )
 
-object biomeProbCoeffs:
-  val baseValue = 0.95
-  val biome = 1.0
-  val dry = 0.9
-  val groundwater = 1.05
-  val meltedPermafrost = 1.02
-  val soil = 1.02
-  val rock = 0.9
-  val coast = 1.15
-  val lake = 1.10
+object biomeWinningProbabilities:
+  val baseValue = 0.05
+  val dry = 0.05
+  val groundwater = 0.5
+  val moltenPermafrost = 0.7 // P(frostPermafrost) = P(rock)
+  val soil = 0.4
+  val rock = 0.05
+  val coast = 1              // P(frostCoast) = P(rock)
+  val lake = 0.8             // P(frostLake) = P(rock)
+
 
 object defaultDescriptions:
   val biome = "Hmm... you have entered a new location. How intriguing is the nature of another planet. \n" +
     "Exploring around would be a good idea. \n"
 
-  val dry = "A dead land void of visible water reaches almost the horizon. Is it really a good idea \n" +
-    "to start biocolonization here? \n"
-  val groundwater = "Oh! Wait! It's almost as if you could see a glint of wet soil deep inside of the bottomless \n" +
-    "dry cracks on the surface. I wonder whether there's water somewhere. "
-  val moltenPermafrost = "The soil here is so moist it's almost like a swamp! I can see a few craters, this \n" +
-    "must have been a permafrost plain. "
-  val permafrost = "What is more, the ground feels suspiciously hard beneath your feets. It's almost like \n" +
-    "it's frozen. This resembles Siberia, where the frost continues meters beneath the surface. "
-  val soil = "Well, it seems like with getting all the parameters close enough to those of our Earth, settling \n" +
-    "here wouldn't be the worst idea. "
-  val rock = "Whoops! Caution, your 100 M€ space rover almost fell into one of those meters-wide drought cracks. \n" +
-    "Maybe better find an easier place. "
+  val dry = "A dead land void of visible water reaches almost the horizon.\n"
+  val groundwater = "Oh! Wait! It's almost as if you could see a glint of wet soil deep inside of the \n" +
+    "cracks on the surface. Maybe there's water somewhere. \n"
+  val moltenPermafrost = "The soil here is so moist it's almost like a swamp! This must have been a permafrost plain.\n"
+  val permafrost = "What is more, the ground feels suspiciously hard beneath your feets. Reminds me of Siberia.\n"
+  val soil = "Well, the ground looks moist. This could be a good cell-culturing spot.\n"
+  val rock = "Whoops! You see kilometers of rocks. You have never seen anything drier than this place. \n"
 
-  val moltenWaterBiome = "A gentle sigh of waves reaches your ears. A soohing rhythm against the stillness of the landscape; \n" +
-    "with your eyes you begin to search for the source of the sound. \n"
-  val frostCoast = "You surmount a hill and your entire expedition crew is in awe—you've arrived at the frontier of a vast \n" +
-    "ocean of ice extending far into the horizon. This'd be the perfect spot if only the ocean wasn't frozen. "
+  val moltenWaterBiome = "You hear a soohing rhythm against the stillness of the landscape.\n"
+  val frostCoast = "You surmount a hill and you're in awe—you see the frontier of a vast ocean of ice. \n" +
+    "This'd be the perfect spot if only the ocean wasn't frozen. \n"
   val moltenCoast = "Where before a desert of ice reached beyond the horizon, you now see a shimmering expanse of reddish, \n" +
-    "rippling water. Faint traces of melting ice hug the shoreline and you feel excitement growing in your chest. "
-  val frostLake = "A cold, windy and harsh savannah opens under your eyes. The ground here is flat and seems to be reflecting \n" +
-    "the reddish clouds of the sky. Looks like a lake of ice. "
-  val moltenLake = "A considerable body of water in its liquid form lays at the bottom of a valley. The view is calming, although \n" +
-    "the reddish hue adds an element of danger tto it. This surely would be a sweet start for cell culturing!"
+    "rippling water. Faint traces of melting ice hug the shoreline.\n"
+  val frostLake = "A cold, windy savannah opens under your eyes. The ground here is flat and reflects " +
+    "the reddish sky. Looks like a lake of ice.\n"
+  val moltenLake = "A body of liquid water lays at the bottom of a valley. The view is calming, although \n" +
+    "the reddish hue adds an element of danger to it.\n"

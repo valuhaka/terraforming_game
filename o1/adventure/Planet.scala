@@ -12,15 +12,13 @@ class Planet(paramMagnitudes: Map[String, Double], biomeProbabilities: Map[Strin
 
   val params: Map[String, Parameter] = Map(
     "temp"             -> Temperature(paramMagnitudes("temp")),
-    "moisture"         -> Moisture(paramMagnitudes("moisture")),
-    "pressure"         -> Pressure(paramMagnitudes("pressure")),
     "N2"               -> N2(paramMagnitudes("N2")),
     "O2"               -> O2(paramMagnitudes("O2")),
     "CO2"              -> CO2(paramMagnitudes("CO2")),
-    "toxic gases"      -> ToxicGases(paramMagnitudes("toxic gases")),
-    "logisticDistance" -> logisticDistance(paramMagnitudes("logisticDistance")),
-    "H2O"              -> H2O(paramMagnitudes("H2O").toInt)
+    "logisticDistance" -> logisticDistance(paramMagnitudes("logisticDistance"))
   )
+
+  def habit() = this.isHabited = true
 
   def isLivable =
     this.params.forall { case (name, param) =>
@@ -28,12 +26,15 @@ class Planet(paramMagnitudes: Map[String, Double], biomeProbabilities: Map[Strin
     }
 
   def updatePlanetBiomes() =
-    if this.params("temp") >= Temperature(0) then
+    if this.params("temp") >= Temperature(273) then
       this.world.locations.foreach { case ((_, _), loc) =>
         loc.getBiome match
-          case Some(biome: Coast) => biome.melt()
-          case Some(biome: Lake) => biome.melt()
-          case Some(biome: Permafrost) => biome.melt()
+          case Some(biome: Coast) =>
+            biome.melt()
+          case Some(biome: Lake) =>
+            biome.melt()
+          case Some(biome: Permafrost) =>
+            biome.melt()
           case _ => true
       }
     else
@@ -50,6 +51,9 @@ class Planet(paramMagnitudes: Map[String, Double], biomeProbabilities: Map[Strin
       this.params(param._1).increase(param._2)
     )
 
+    updatePlanetBiomes()
+    this.world.printAllLocs()
+
   def adjustParam(param: String, delta: Double = 0, scalar: Double = 1) =
     if delta != 0 then params(param).increase(delta)
     else params(param).multiply(scalar)
@@ -58,3 +62,6 @@ class Planet(paramMagnitudes: Map[String, Double], biomeProbabilities: Map[Strin
 
   override def toString =
     params.map( (param, value) => s"$param: ${value.getMagnitude}" ).mkString("\n")
+
+  // update the biomes according to the temperature
+  this.updatePlanetBiomes()

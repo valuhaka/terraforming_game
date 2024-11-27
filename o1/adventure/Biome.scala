@@ -1,18 +1,16 @@
 package o1.adventure
 
-import scala.collection.mutable.Map
 
+// our intention originally was to change the description at certain locations according to whether they have molten or not (which
+// depends on the planet's temperature) but we could not make our code work and we can't understand why.
+// The code now just returns the descriptions of the frozen versions of the biomes.
 
 sealed trait Biome(val name: String, world: World):
-  protected var description: String
   override def toString = s"${this.name.toUpperCase}: ${this.getDescription}"
 
-  def probabilityCoefficient = biomeProbCoeffs.baseValue
+  def winningProbability = biomeWinningProbabilities.baseValue
 
-  def setDescription(newDescription: String) =
-    this.description = newDescription
-
-  def getDescription = this.description
+  def getDescription: String
 
 end Biome
 
@@ -22,10 +20,9 @@ end Biome
 sealed trait Dry extends Biome:
   protected var desription: String = defaultDescriptions.dry
 
-  def isFrost = false
   def isFavorable = false
 
-  override def probabilityCoefficient = biomeProbCoeffs.dry
+  override def winningProbability = biomeWinningProbabilities.dry
   override def getDescription = defaultDescriptions.dry
 
 end Dry
@@ -33,51 +30,50 @@ end Dry
 /**
   * In groundwater biome weak bonuses are readily available
   *
-  * @param description The description of the biome.
   */
-class Groundwater(protected var description: String = "", world: World)
+class Groundwater(world: World)
   extends Dry, Biome("dry, groundwater", world):
 
   override def isFavorable = true
-  override def probabilityCoefficient = biomeProbCoeffs.groundwater
+  override def winningProbability = biomeWinningProbabilities.groundwater
 
   override def toString = s"${super.getDescription}${this.getDescription}"
 
   override def getDescription =
-    if this.description == "" then
-      defaultDescriptions.groundwater
-    else
-      this.description
+    defaultDescriptions.groundwater
 
 end Groundwater
 
 /**
   * Permafrost biome does not provide bonuses unless avg(T) > 280 K has held for at least 100 years.
   *
-  * @param description The description of the biome.
   */
-class Permafrost(protected var description: String = "", world: World)
+class Permafrost(world: World)
   extends Biome("dry, permafrost", world), Dry:
 
-  private var is1Frost = true
+  private var isFrost = true
 
-  def frozen = this.is1Frost
+  def frozen = this.isFrost
 
-  def melt() = this.is1Frost = false
-  def freeze() = this.is1Frost = true
+  def melt() =
+    println("MELTING BIOME")
+    println(s"Biome state: ${this.frozen}")
+    this.isFrost = false
+    println(s"After melt: ${this.frozen}")
+  def freeze() = this.isFrost = true
 
-  override def probabilityCoefficient =
-    if this.frozen then super.probabilityCoefficient
-    else biomeProbCoeffs.meltedPermafrost  // if frozen provide a good bonus
+  // our intention was originally to change the winning probability at this location according to whether it has molten or not
+  // but we could not make our code work and we can't understand why. The original code here is commented, but now the winning
+  // probability is just the probability of a molten biome, regardless of the temperature.
+  override def winningProbability = biomeWinningProbabilities.moltenPermafrost
+    //if this.frozen then super.winningProbability
+    //else biomeWinningProbabilities.moltenPermafrost  // if molten then provide a good probability
 
   override def toString = s"${super.getDescription}${this.getDescription}"
 
   override def getDescription =
-    if this.description == "" then
-      if this.frozen then defaultDescriptions.permafrost
-      else defaultDescriptions.moltenPermafrost
-    else
-      this.description
+    if this.frozen then defaultDescriptions.permafrost
+    else defaultDescriptions.moltenPermafrost
 
 end Permafrost
 
@@ -85,20 +81,16 @@ end Permafrost
 /**
   * In soil biome bonuses are similar to lake or ocean biome as far as moisture is optimal
   *
-  * @param description The description of the biome.
   */
-class Soil(protected var description: String = "", world: World)
+class Soil(world: World)
   extends Biome("dry, soil", world), Dry:
 
   override def isFavorable = true
-  override def probabilityCoefficient = biomeProbCoeffs.soil
+  override def winningProbability = biomeWinningProbabilities.soil
   override def toString = s"${super.getDescription}${this.getDescription}"
 
   override def getDescription =
-    if this.description == "" then
-      defaultDescriptions.soil
-    else
-      this.description
+    defaultDescriptions.soil
 
 end Soil
 
@@ -106,40 +98,36 @@ end Soil
 /**
   * In rock biome no bonuses
   *
-  * @param description The description of the biome.
   */
-class Rock(protected var description: String = "", world: World)
+class Rock(world: World)
   extends Biome("dry, rock", world), Dry:
 
   override def toString = s"${super.getDescription}${this.getDescription}"
 
   override def getDescription =
-    if this.description == "" then
-      defaultDescriptions.rock
-    else
-      this.description
+    defaultDescriptions.rock
 
 end Rock
 
 
 sealed trait WaterBiome extends Biome:
   protected var isLiquid = false
-  protected var desription: String = defaultDescriptions.dry
 
   val meltingThreshold: Int
   val maxCapsuleCapacity: Option[Int] // allow infinite capacity
 
-  override def probabilityCoefficient = biomeProbCoeffs.baseValue
+  override def winningProbability = biomeWinningProbabilities.baseValue
 
-  def melt() = this.isLiquid = false
-  def freeze() = this.isLiquid = true
+  def melt() = this.isLiquid = true
+  def freeze() = this.isLiquid = false
 
-  def ignoreMoisture = true
   def frozen = !isLiquid
 
   override def getDescription =
-    if this.isLiquid then defaultDescriptions.moltenWaterBiome
-    else ""
+    if this.frozen then
+      ""
+    else
+      defaultDescriptions.moltenWaterBiome
 
 end WaterBiome
 
@@ -147,9 +135,8 @@ end WaterBiome
 /**
   * Increased cell growth probabilities; moisture parameter is irrelevant
   *
-  * @param description The description of the biome.
   */
-class Coast(protected var description: String, world: World)
+class Coast(world: World)
   extends Biome("coast", world), WaterBiome:
   // melts after 120 months
   val meltingThreshold = 120
@@ -158,19 +145,18 @@ class Coast(protected var description: String, world: World)
 
   override def toString = s"${super.getDescription}${this.getDescription}"
 
-  // big risk; big reward
-  override def probabilityCoefficient =
-    if this.frozen then
-      biomeProbCoeffs.baseValue
-    else
-      biomeProbCoeffs.coast
+  // our intention was originally to change the winning probability at this location according to whether it has molten or not
+  // but we could not make our code work and we can't understand why. The original code here is commented, but now the winning
+  // probability is just the probability of a molten biome, regardless of the temperature.
+  override def winningProbability = biomeWinningProbabilities.coast
+    //if this.frozen then
+    //  biomeWinningProbabilities.baseValue
+    //else
+    //  biomeWinningProbabilities.coast
 
   override def getDescription =
-    if this.description == "" then
-      if this.isLiquid then defaultDescriptions.moltenCoast
-      else defaultDescriptions.frostCoast
-    else
-      this.description
+    if this.frozen then defaultDescriptions.frostCoast
+    else defaultDescriptions.moltenCoast
 
 end Coast
 
@@ -178,9 +164,8 @@ end Coast
 /**
   * Increased cell growth probabilities; moisture parameter is irrelevant
   *
-  * @param description The description of the biome.
   */
-class Lake(protected var description: String, world: World)
+class Lake(world: World)
   extends Biome("lake", world), WaterBiome:
   //melts after 12 months
   val meltingThreshold = 12
@@ -189,18 +174,17 @@ class Lake(protected var description: String, world: World)
 
   override def toString = s"${super.getDescription}${this.getDescription}"
 
-  // good growth bonus
-  override def probabilityCoefficient =
-    if this.frozen then
-      biomeProbCoeffs.baseValue
-    else
-      biomeProbCoeffs.lake
+  // our intention was originally to change the winning probability at this location according to whether it has molten or not
+  // but we could not make our code work and we can't understand why. The original code here is commented, but now the winning
+  // probability is just the probability of a molten biome, regardless of the temperature.
+  override def winningProbability = biomeWinningProbabilities.lake
+    //if this.frozen then
+    //  biomeWinningProbabilities.baseValue
+    //else
+    //  biomeWinningProbabilities.lake
 
   override def getDescription =
-    if this.description == "" then
-      if this.isLiquid then defaultDescriptions.moltenLake
-      else defaultDescriptions.frostLake
-    else
-      this.description
+    if this.frozen then defaultDescriptions.frostLake
+    else defaultDescriptions.moltenLake
 
 end Lake

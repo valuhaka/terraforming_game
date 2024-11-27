@@ -22,3 +22,15 @@ class World(val biomeProbabilities: Map[String, Double]):
   // Assign a biome to each of the locations.
   assignBiomesToLocations(this)
 
+  def printAllLocs() =
+    this.locations.foreach { case ((x, y), loc) =>
+      val biome = loc.getBiome.getOrElse(Rock(this))
+      println(s"At ($x, $y) is $loc with a ${biome.name}. \nBiome prob: ${biome.winningProbability}\nBiome description: ${biome}.")
+      biome match
+        case b: Coast => println(s"Is coast at $loc frozen: ${b.frozen}")
+        case b: Lake => println(s"Is lake at $loc frozen: ${b.frozen}")
+        case b: Permafrost => println(s"Is permafrost at $loc frozen: ${b.frozen}")
+        case b => println("Not a melting biome")
+      println()
+    }
+

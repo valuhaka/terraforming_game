@@ -24,6 +24,22 @@ extension [A: Numeric](pair1: (A, A))
   def !=(pair2: (A, A)): Boolean = pair1._1 != pair2._1 || pair1._2 != pair2._2
 
 
+def randomPlanet: Map[String, Double] =
+  // a temperature between 223 K and 373 K
+  val temp = 223 + (373 - 223) * Random.nextDouble()
+  // N2 % between 40 and 90
+  val N2 = 40 + (90 - 40) * Random.nextDouble()
+  // O2 % between 0 and N2 %
+  val O2 = N2 * Random.nextDouble()
+  // CO2 between 0 and O2 %
+  val CO2 = O2 * Random.nextDouble()
+
+  Map(
+    "temp" -> temp,
+    "N2"   -> N2,
+    "O2"   -> O2,
+    "CO2"  -> CO2
+  )
 
 /** This method takes the name of a [[Biome]] as a String and returns the corresponding biome with
   * the default description.
@@ -32,12 +48,12 @@ extension [A: Numeric](pair1: (A, A))
   * @return [[Biome]]
   */
 def createBiome(biomeName: String, world: World): Biome = biomeName match {
-  case "groundwater" => new Groundwater("", world)
-  case "permafrost"  => new Permafrost("", world)
-  case "soil"        => new Soil("", world)
-  case "rock"        => new Rock("", world)
-  case "coast"       => new Coast("", world)
-  case "lake"        => new Lake("", world)
+  case "groundwater" => new Groundwater(world)
+  case "permafrost"  => new Permafrost(world)
+  case "soil"        => new Soil(world)
+  case "rock"        => new Rock(world)
+  case "coast"       => new Coast(world)
+  case "lake"        => new Lake(world)
   case unknownBiome  => throw new IllegalArgumentException(s"Unknown biome: $unknownBiome")
 }
 

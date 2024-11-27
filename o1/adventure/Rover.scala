@@ -27,6 +27,7 @@ class Rover(val world: World, private var coords: (Int, Int) = (0, 0)):
       s"You can't pack your stuff because haven't settled here."
 
   def load() =
+    println("ROVER LOADED ON THE PLANET")
     // if the rover is NOT at origo, proceed to examine whether it has settled
     if this.currentCoords != (0, 0) then
       // if the expedition crew does NOT have a base, then load rover to the origo

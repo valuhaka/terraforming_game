@@ -14,12 +14,9 @@ case class Item(val name: String, val description: String,
                 val price: Int, val isUsableOnPlanet: Boolean):
   var paramDeltas: Map[String, Double] = Map(
     "temp"     -> 0,
-    "moisture" -> 0,
-    "pressure" -> 0,
     "N2"       -> 0,
     "O2"       -> 0,
-    "CO2"      -> 0,
-    "toxic gases" -> 0
+    "CO2"      -> 0
   )
 
   def param(name: String): Option[Double] = paramDeltas.get(name)

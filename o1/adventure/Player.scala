@@ -1,6 +1,7 @@
 package o1.adventure
 
 import scala.collection.mutable.Map
+import scala.util.Random
 
 /** A `Player` object represents a player character controlled by the real-life user
   * of the program.
@@ -20,8 +21,9 @@ class Player(startingMoney: Int, startingEnergy: Int):
 
   val inventory = Inventory()
   val rover = Rover(World(testBiomeProbs))
-  val planet = Planet(testParamMagnitudes, testBiomeProbs)
+  val planet = Planet(tutorialPlanetMagnitudes, testBiomeProbs)
   val market = Market()
+
 
   /** Determines if the player has indicated a desire to quit the game. */
   def hasQuit: Boolean = this.quitCommandGiven
@@ -52,14 +54,24 @@ class Player(startingMoney: Int, startingEnergy: Int):
 
   //* Use the capsule. May win the game. */
   def useCapsule: String =
-    if this.planet.isLivable then
+    if !this.onPlanet then
+      "You may not use bio-capsules if you have not landed!"
+    else if this.planet.isLivable then
       this.use("bio-capsule", 1) match
         case str if str.startsWith("Not enough") => "Not enough bio-capsules."
         case str =>
-          this.planet.isHabited = true
-          ""
+          this.rover.currentLocation.getBiome match
+            case Some(biome) =>
+              if Random.nextDouble() <= biome.winningProbability then
+                this.planet.habit()
+                "Hooray! The bio-capsule has succesfully been deployed."
+              else
+                "Uh oh! Looks like your bio-capsule died. Find a better location or deploy another bio-capsule."
+            case None => "Error: no biome here."
+
     else
       "You may not use a capsule before the planet is sufficiently terraformed!"
+
 
   /** Causes the player to skip a turn (this has no substantial effect in game terms). */
   def skip(): String =
@@ -77,7 +89,8 @@ class Player(startingMoney: Int, startingEnergy: Int):
   def land(): String =
     if !this.onPlanet then
       this.onPlanet = true
-      "You have reached the planet's surface.\nYour rover's fusion reactors start up.\n"
+      "You have reached the planet's surface.\nYour rover's fusion reactors start up.\n" +
+      s"${this.rover.load()}"
     else
       "You cannot land if you're already on the planet!\n"
 
