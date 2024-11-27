@@ -1,5 +1,10 @@
 ![](planet_pic.jpg)
 *Source: [FreePik](https://www.freepik.com/free-photo/3d-rendering-planet-mars-broadband-internet-system-meet-needs-consumers_29006459.htm#fromView=search&page=1&position=12&uuid=1755c36c-3d54-4f02-8219-3fbdba15837c)*
+
+## About
+
+This game was designed and written by Luka Vähäsarja and Oscar Escartin for Programming 1, a course at Aalto University.
+
 ## How to play
 
 In this game, you must terraform a planet and seed it with microscopic life. In practice, this can be achieved buy using items bought from the in-game store.
